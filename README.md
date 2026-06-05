@@ -3,7 +3,7 @@
 > A powerful, single-file personal finance dashboard that runs entirely in your browser.
 > No backend. No subscription. No data leaves your device.
 
-![Front_Page](screenshots/front-page.png)
+![Front_Page](screenshots/Front-Page.png)
 
 ---
 
