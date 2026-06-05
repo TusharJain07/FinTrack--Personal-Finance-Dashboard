@@ -3,7 +3,7 @@
 > A powerful, single-file personal finance dashboard that runs entirely in your browser.
 > No backend. No subscription. No data leaves your device.
 
-![Dashboard](screenshots/dashboard.png)
+![Front_Page](screenshots/front-page.png)
 
 ---
 
@@ -47,7 +47,7 @@
 ## 🚀 Quick Start
 
 ### Option 1 — Use Online (GitHub Pages)
-Visit the live app: **[https://yourusername.github.io/fintrack](https://yourusername.github.io/fintrack)**
+Visit the live app: **[https://yourusername.github.io/fintrack](https://TusharJain07.github.io/fintrack)**
 
 No installation needed — opens directly in your browser.
 
@@ -166,18 +166,11 @@ You may not:
 
 Built with the assistance of [Claude](https://claude.ai) by Anthropic — demonstrating AI-assisted development through iterative prompt engineering, feature design and debugging.
 
-- 🔗 [LinkedIn](https://linkedin.com/in/yourprofile)
-- 💻 [GitHub](https://github.com/yourusername)
+- 🔗 [LinkedIn](https://www.linkedin.com/in/tusharjain07/)
+- 💻 [GitHub](https://github.com/TusharJain07)
 
 ---
 
-## 🗺️ Roadmap
-
-- [ ] PWA support (install as mobile app, offline service worker)
-- [ ] Mobile-responsive layout (bottom navigation, touch-friendly)
-- [ ] Dark mode toggle
-- [ ] CSV/Excel export
-- [ ] Multiple FY comparison charts
 
 ---
 
