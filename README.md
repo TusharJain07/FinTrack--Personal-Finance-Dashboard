@@ -78,6 +78,25 @@ No installation needed — opens directly in your browser.
 4. Use **↓ Cloud** in the top bar to sync across devices
 
 ---
+## Security Architecture
+
+### Lock Screen
+- A **4-digit PIN** protects the entire dashboard
+- PIN is hashed with **SHA-256** (Web Crypto API) — the raw PIN is never stored
+- **Security question + answer** (also SHA-256 hashed) enables passcode reset
+- **Auto-lock**: configurable timeout (15 min to 8 hours); always locks on new device/session
+- **3 wrong attempts** → 30-second lockout
+- **Inactivity timer**: auto-locks after 5 minutes of no interaction
+
+---
+## 🔒 Privacy
+
+- **No data collection** — zero analytics, zero tracking, zero third-party services
+- **No account required** — works completely offline
+- **Your data stays on your device** — unless you explicitly set up Cloud Sync
+- **Open source** — full source is visible in this repository
+
+---
 
 ## 💡 How It Works
 
@@ -128,15 +147,6 @@ You log:  From: HDFC Bank  →  To: Axis Credit Card Bill  →  ₹15,000  →  
 - **Categories** — Add/rename in Settings → update everywhere (Dashboard, Budget, Monthly Summary)
 - **Financial Year** — Range 2020–2099, auto-detects current FY on first load
 - **KPI cards** — One card per category section — add a section, get a KPI card automatically
-
----
-
-## 🔒 Privacy
-
-- **No data collection** — zero analytics, zero tracking, zero third-party services
-- **No account required** — works completely offline
-- **Your data stays on your device** — unless you explicitly set up Cloud Sync
-- **Open source** — full source is visible in this repository
 
 ---
 
