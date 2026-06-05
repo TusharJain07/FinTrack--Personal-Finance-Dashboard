@@ -1,0 +1,11 @@
+© 2026 Tushar Jain. All rights reserved.
+
+This project is made available for personal use. You are free to:
+- Use it for personal finance tracking
+- Fork it and customise it for your own use
+- Share it with attribution to the original author
+
+You may not:
+- Remove or modify the copyright notice
+- Redistribute it as your own work
+- Use it for commercial purposes without permission
