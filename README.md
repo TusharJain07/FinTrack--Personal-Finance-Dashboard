@@ -52,7 +52,7 @@ Built with the assistance of **[Claude](https://claude.ai)** by Anthropic
 ## 🚀 Quick Start
 
 ### Option 1 — Use Online (GitHub Pages)
-Visit the live app: **[FinTrack--Personal-Finance-Dashboard](https://tusharjain07.github.io/FinTrack--Personal-Finance-Dashboard/)**
+Visit the live app: **[FinTrack--Personal-Finance-Dashboard](https://tusharjain07.github.io/FinTrack-Personal_Finance_Dashboard/)**
 
 No installation needed — opens directly in your browser.
 
