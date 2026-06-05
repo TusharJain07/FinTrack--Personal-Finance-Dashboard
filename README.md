@@ -1,6 +1,6 @@
 # FinTrack — Personal Finance Dashboard
 
-**FinTrack** is a fully self-contained, single-file HTML personal finance dashboard — no frameworks, no server, no installation required. You simply download one `.html` file, open it in any browser, and your entire financial tracking system is ready to use. All data is saved locally in your browser's `localStorage`.
+**FinTrack** is a fully self-contained, personal finance dashboard — no frameworks, no server, no installation required. You simply download one `.html` file, open it in any browser, and your entire financial tracking system is ready to use. All data is saved locally in your browser's `localStorage`.
 
 > It was designed for the Indian financial context — amounts are displayed in ₹ (Indian Rupees) with proper Lakh/Crore formatting — but the structure and concepts are universally applicable.
 
@@ -52,7 +52,7 @@ Built with the assistance of **[Claude](https://claude.ai)** by Anthropic
 ## 🚀 Quick Start
 
 ### Option 1 — Use Online (GitHub Pages)
-Visit the live app: **[FinTrack--Personal-Finance-Dashboard](https://tusharjain07.github.io/FinTrack-Personal_Finance_Dashboard/)**
+Visit the live app: **[FinTrack-Personal_Finance_Dashboard](https://tusharjain07.github.io/FinTrack-Personal_Finance_Dashboard/)**
 
 No installation needed — opens directly in your browser.
 
