@@ -2900,17 +2900,24 @@ function pinBack(kbId, dotsId){
 }
 
 // ── KEYBOARD INPUT ON LOCK SCREEN ────────────────────────
+// Steps use CSS class 'active' (not style.display) — check classList
 document.addEventListener('keydown', function(e){
   var ls = document.getElementById('lockscreen');
   if(!ls || ls.style.display==='none') return;
-  // Find which step is currently visible
+  // Map each step to its keypad and dots IDs
+  var stepMap = [
+    {step:'step-unlock',  kb:'unlock-keypad',  dots:'unlock-dots'},
+    {step:'step-setup',   kb:'setup-keypad',   dots:'setup-dots'},
+    {step:'step-confirm', kb:'confirm-keypad', dots:'confirm-dots'},
+    {step:'step-newpin',  kb:'newpin-keypad',  dots:'newpin-dots'}
+  ];
   var kbId, dotsId;
-  var stepUnlock  = document.getElementById('step-unlock');
-  var stepSetup   = document.getElementById('step-setup');
-  var stepConfirm = document.getElementById('step-confirm');
-  if(stepUnlock  && stepUnlock.style.display !=='none'){ kbId='unlock-keypad';  dotsId='unlock-dots'; }
-  else if(stepSetup   && stepSetup.style.display  !=='none'){ kbId='setup-keypad';   dotsId='setup-dots'; }
-  else if(stepConfirm && stepConfirm.style.display!=='none'){ kbId='confirm-keypad'; dotsId='confirm-dots'; }
+  for(var i=0;i<stepMap.length;i++){
+    var el=document.getElementById(stepMap[i].step);
+    if(el && el.classList.contains('active')){
+      kbId=stepMap[i].kb; dotsId=stepMap[i].dots; break;
+    }
+  }
   if(!kbId) return;
   if(e.key>='0' && e.key<='9'){
     e.preventDefault();
