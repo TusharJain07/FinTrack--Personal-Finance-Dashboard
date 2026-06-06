@@ -1119,11 +1119,11 @@ var FY_YEARS = (function(){ var a=[]; for(var y=2020;y<=2099;y++) a.push(y); ret
 function defaultSections() {
   return [
     { id:'investments', name:'Investments', col:'#7c3aed', items:[
-        {id:'sip1',lbl:'SIP 1',ck:'SIP 1'},
-        {id:'sip2',lbl:'SIP 2',ck:'SIP 2'},
-        {id:'sip3',lbl:'SIP 3',ck:'SIP 3'},
-        {id:'sip4',lbl:'SIP 4',ck:'SIP 4'},
-        {id:'stk', lbl:'Stocks',ck:'Stocks'}
+        {id:'sip1',lbl:'Mutual Fund 1',ck:'SIP 1'},
+        {id:'sip2',lbl:'Mutual Fund 2',ck:'SIP 2'},
+        {id:'sip3',lbl:'Mutual Fund 3',ck:'SIP 3'},
+        {id:'sip4',lbl:'Mutual Fund 4',ck:'SIP 4'},
+        {id:'stk', lbl:'Stocks / ETF', ck:'Stocks'}
     ]},
     { id:'loans', name:'Loans', col:'#1d4ed8', items:[
         {id:'ln1',lbl:'Loan - Education',ck:'Loan - Education'},
@@ -1146,10 +1146,10 @@ function defaultSections() {
         {id:'e13',lbl:'Expense - Miscellaneous',     ck:'Expense - Miscellaneous'}
     ]},
     { id:'ccbills', name:'Credit Card Bills', col:'#dc2626', items:[
-        {id:'cc1',lbl:'CC Bill - Axis',         ck:'CC Bill - Axis'},
-        {id:'cc2',lbl:'CC Bill - SBI',          ck:'CC Bill - SBI'},
-        {id:'cc3',lbl:'CC Bill - HDFC',         ck:'CC Bill - HDFC'},
-        {id:'cc4',lbl:'CC Bill - Amazon ICICI', ck:'CC Bill - Amazon ICICI'}
+        {id:'cc1',lbl:'Credit Card Bill 1', ck:'CC Bill - Axis'},
+        {id:'cc2',lbl:'Credit Card Bill 2', ck:'CC Bill - SBI'},
+        {id:'cc3',lbl:'Credit Card Bill 3', ck:'CC Bill - HDFC'},
+        {id:'cc4',lbl:'Credit Card Bill 4', ck:'CC Bill - Amazon ICICI'}
     ]}
   ];
 }
@@ -1160,16 +1160,16 @@ function defaultFromOptions() {
         {id:'i2',lbl:'Dividends',        ck:'Dividends'}
     ]},
     { id:'banks', name:'Bank Accounts', items:[
-        {id:'b1',lbl:'HDFC - Salary Account',   ck:'HDFC - Salary Account'},
-        {id:'b2',lbl:'KOTAK - Expense Account',  ck:'KOTAK - Expense Account'},
-        {id:'b3',lbl:'BOI - Investment Account', ck:'BOI - Investment Account'},
-        {id:'b4',lbl:'ICICI - Savings Account',  ck:'ICICI - Savings Account'}
+        {id:'b1',lbl:'My Salary Account',    ck:'HDFC - Salary Account'},
+        {id:'b2',lbl:'My Expense Account',   ck:'KOTAK - Expense Account'},
+        {id:'b3',lbl:'My Investment Account',ck:'BOI - Investment Account'},
+        {id:'b4',lbl:'My Savings Account',   ck:'ICICI - Savings Account'}
     ]},
     { id:'cards', name:'Credit Cards', items:[
-        {id:'c1',lbl:'Axis Credit Card',         ck:'Axis Credit Card'},
-        {id:'c2',lbl:'SBI Credit Card',          ck:'SBI Credit Card'},
-        {id:'c3',lbl:'HDFC Credit Card',         ck:'HDFC Credit Card'},
-        {id:'c4',lbl:'Amazon ICICI Credit Card', ck:'Amazon ICICI Credit Card'}
+        {id:'c1',lbl:'My Credit Card 1', ck:'Axis Credit Card'},
+        {id:'c2',lbl:'My Credit Card 2', ck:'SBI Credit Card'},
+        {id:'c3',lbl:'My Credit Card 3', ck:'HDFC Credit Card'},
+        {id:'c4',lbl:'My Credit Card 4', ck:'Amazon ICICI Credit Card'}
     ]}
   ];
 }
@@ -2428,7 +2428,13 @@ function renderCatMgr(){
   ensureData();
   var w=document.getElementById('cat-mgr');
   if(!w) return;
-  var html='<div class="add-cat-row" style="margin-bottom:10px;padding:10px;background:var(--bg);border-radius:var(--r);border:1px dashed var(--border2)">'+
+  // Show setup banner for new users
+  var setupBannerCat=S.txns.length===0
+    ?'<div style="background:#fef9c3;border:1px solid #fde047;border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:#713f12;line-height:1.6">'+
+      '&#128204; <b>These are sample categories.</b> Rename the Mutual Funds to your actual fund names, add your credit card bill names, and remove categories you don\'t need. '+
+      'Click the pencil &#9998; icon next to any item to rename it.'+
+      '</div>':''
+  var html=setupBannerCat+'<div class="add-cat-row" style="margin-bottom:10px;padding:10px;background:var(--bg);border-radius:var(--r);border:1px dashed var(--border2)">'+
     '<input class="add-cat-inp" type="text" id="new-section-name" placeholder="New section name (e.g. Insurance, Utilities)..."/>'+
     ' <button class="btn-add-cat" onclick="addSection()">+ Add Section</button>'+
     '</div>';
@@ -2527,7 +2533,13 @@ function renderFromMgr(){
   ensureData();
   var w=document.getElementById('from-mgr');
   if(!w) return;
-  var html='<div class="add-cat-row" style="margin-bottom:10px;padding:10px;background:var(--bg);border-radius:var(--r);border:1px dashed var(--border2)">'+
+  // Show setup banner for new users
+  var setupBanner=S.txns.length===0
+    ?'<div style="background:#fef9c3;border:1px solid #fde047;border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;color:#713f12;line-height:1.6">'+
+      '&#128204; <b>These are sample entries.</b> Rename them to match your actual bank accounts and credit cards. '+
+      'Click the pencil &#9998; icon next to any item to rename it, or delete and add your own.'+
+      '</div>':''
+  var html=setupBanner+'<div class="add-cat-row" style="margin-bottom:10px;padding:10px;background:var(--bg);border-radius:var(--r);border:1px dashed var(--border2)">'+
     '<input class="add-cat-inp" type="text" id="new-from-section" placeholder="New section name (e.g. Cash, Rental Income)..."/>'+
     ' <button class="btn-add-cat" onclick="addFromSection()">+ Add Section</button>'+
     '</div>';
