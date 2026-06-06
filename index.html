@@ -2887,6 +2887,29 @@ function pinBack(kbId, dotsId){
   }
 }
 
+// ── KEYBOARD INPUT ON LOCK SCREEN ────────────────────────
+document.addEventListener('keydown', function(e){
+  var ls = document.getElementById('lockscreen');
+  if(!ls || ls.style.display==='none') return;
+  // Find which step is currently visible
+  var kbId, dotsId;
+  var stepUnlock  = document.getElementById('step-unlock');
+  var stepSetup   = document.getElementById('step-setup');
+  var stepConfirm = document.getElementById('step-confirm');
+  if(stepUnlock  && stepUnlock.style.display !=='none'){ kbId='unlock-keypad';  dotsId='unlock-dots'; }
+  else if(stepSetup   && stepSetup.style.display  !=='none'){ kbId='setup-keypad';   dotsId='setup-dots'; }
+  else if(stepConfirm && stepConfirm.style.display!=='none'){ kbId='confirm-keypad'; dotsId='confirm-dots'; }
+  if(!kbId) return;
+  if(e.key>='0' && e.key<='9'){
+    e.preventDefault();
+    pinPress(e.key, kbId, dotsId);
+  } else if(e.key==='Backspace'){
+    e.preventDefault();
+    pinBack(kbId, dotsId);
+  }
+});
+
+
 function pinClear(dotsId){
   _pinBuffer='';
   updateDots(dotsId, 0);
