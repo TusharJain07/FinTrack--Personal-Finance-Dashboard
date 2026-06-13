@@ -3656,13 +3656,15 @@ function bootLock(){
     showStep('step-setup');
     initSetup();
     ls.style.display='flex';
-  } else if(shouldLock()){
+  } else if(shouldLock() || (isEncrypted() && !ENC.dek)){
+    // Must unlock if: lock timer expired, OR data is encrypted but not yet
+    // decrypted in this session (page was reloaded — DEK is gone from memory).
     ls.style.display='flex';
     document.getElementById('lock-sub').textContent='Enter passcode';
     showStep('step-unlock');
     initUnlock();
   } else {
-    // Within remember window — stay unlocked
+    // Within remember window AND data already decrypted — stay unlocked
     ls.style.display='none';
     startInactivityTimer();
   }
@@ -4523,6 +4525,11 @@ bootLock();   // Show lock screen / setup; unlocking triggers renderAll
 applyTabConfig();
 renderAll();
 setTimeout(function(){
+  // Don't redirect while the lock screen is up or data is still encrypted/locked
+  var lsEl=document.getElementById('lockscreen');
+  var locked = lsEl && lsEl.style.display!=='none';
+  if(locked) return;
+  if(isEncrypted() && !ENC.dek) return;
   if(!S.userName){ tab('settings'); toast('👋 Welcome! Please set your name in Settings → Profile.'); }
 },600);
 
