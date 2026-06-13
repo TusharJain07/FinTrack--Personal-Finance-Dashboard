@@ -789,6 +789,13 @@ tr:hover td{background:#f8fafc}
       </div>
     </details>
     <div class="setting-row">
+      <label>Key type</label>
+      <select id="jsonbin-keytype" style="width:160px" onchange="S.cloudKeyType=this.value">
+        <option value="access">Access Key (recommended)</option>
+        <option value="master">Master Key (legacy)</option>
+      </select>
+    </div>
+    <div class="setting-row">
       <label>JSONbin API Key <span style="font-size:11px;color:var(--text3)">(paste your Access Key)</span></label>
       <input type="password" id="jsonbin-key" placeholder="$2b$10$..." style="width:260px;font-family:monospace;font-size:12px"
         onchange="S.cloudKey=this.value"/>
@@ -1254,6 +1261,7 @@ var txnMon = 'all';
 var msMon  = 'all';
 
 function ensureData() {
+  if(S.cloudKeyType===undefined) S.cloudKeyType='access';
   if (!S.sections)    S.sections    = defaultSections();
   if (!S.fromOptions) S.fromOptions = defaultFromOptions();
   // Migrate: add Income Credit group if missing (added in v11)
@@ -3401,7 +3409,7 @@ async function doRestoreCloud(){
   if(pin.length<4){ lockError('restore-error','Enter your 4-digit passcode.'); return; }
   lockError('restore-error','Connecting to cloud...');
   try{
-    var resp=await fetch(JSONBIN_API+'/b/'+bin+'/latest',{headers:{'X-Master-Key':key}});
+    var resp=await fetch(JSONBIN_API+'/b/'+bin+'/latest',{headers:(S.cloudKeyType==='master'?{'X-Master-Key':key}:{'X-Access-Key':key})});
     var data=await resp.json();
     if(data.record && data.record.enc && data.record.fintrack_enc){
       // Encrypted vault — store and unlock with the entered PIN
@@ -3692,6 +3700,17 @@ function syncBadge(state, text){
   el.innerHTML='<span class="sync-dot"></span> '+text;
 }
 
+// Returns the correct auth header object for JSONbin.
+// Access Keys (recommended) use X-Access-Key; legacy Master Keys use X-Master-Key.
+// Controlled by S.cloudKeyType ('access' default, or 'master').
+function cloudAuthHeader(){
+  var key=cloudKey();
+  var h={};
+  if(S.cloudKeyType==='master'){ h['X-Master-Key']=key; }
+  else { h['X-Access-Key']=key; }
+  return h;
+}
+
 function cloudKey(){
   var el=document.getElementById('jsonbin-key');
   if(el && el.value.trim()) S.cloudKey=el.value.trim();
@@ -3730,7 +3749,7 @@ async function cloudSave(){
       // Create new bin
       resp=await fetch(JSONBIN_API+'/b',{
         method:'POST',
-        headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Name':'FinTrack','X-Bin-Private':'true'},
+        headers:Object.assign({'Content-Type':'application/json','X-Bin-Name':'FinTrack','X-Bin-Private':'true'},cloudAuthHeader()),
         body:payload
       });
       data=await resp.json();
@@ -3746,7 +3765,7 @@ async function cloudSave(){
       // Update existing bin
       resp=await fetch(JSONBIN_API+'/b/'+cloudBin(),{
         method:'PUT',
-        headers:{'Content-Type':'application/json','X-Master-Key':key},
+        headers:Object.assign({'Content-Type':'application/json'},cloudAuthHeader()),
         body:payload
       });
       data=await resp.json();
@@ -3768,7 +3787,7 @@ async function cloudLoad(){
   cloudStatus('Loading from cloud...','');
   try{
     var resp=await fetch(JSONBIN_API+'/b/'+bin+'/latest',{
-      headers:{'X-Master-Key':key}
+      headers:cloudAuthHeader()
     });
     var data=await resp.json();
     if(data.record && data.record.enc && data.record.fintrack_enc){
@@ -3808,6 +3827,9 @@ async function cloudLoad(){
 // Auto cloud-save when regular save is called
 var _origSave=null;
 function initCloudAutoSave(){
+  // Reflect saved key type in the dropdown
+  var kt=document.getElementById('jsonbin-keytype');
+  if(kt && S.cloudKeyType) kt.value=S.cloudKeyType;
   // Wrap save() to also push to cloud if configured
   var realSave=save;
   save=function(){
