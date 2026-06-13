@@ -3078,7 +3078,8 @@ async function enableEncryption(pin, qText, answer){
     ansWrap=await wrapDEK(dek, ansKey);
   }
   var payload=await encryptWithDEK(JSON.stringify(S), dek);
-  var vault={ v:1, salt:_b64encode(salt), pinWrap:pinWrap, ansWrap:ansWrap, qText:qText||'', payload:payload };
+  var qHash = (qText && answer) ? await sha256(_normAnswer(answer)) : '';
+  var vault={ v:1, salt:_b64encode(salt), pinWrap:pinWrap, ansWrap:ansWrap, qText:qText||'', qHash:qHash, payload:payload };
   _encSaveVault(vault);
   ENC.dek=dek; ENC.enabled=true;
   // Remove the plaintext copy — data now lives encrypted only
@@ -3424,11 +3425,15 @@ async function doRestoreCloud(){
         lockError('restore-error','Passcode did not match this backup. Try again.');
         return;
       }
-      // Success — persist cloud creds locally and finish
+      // Success — persist cloud creds + lock state locally and finish
       S.cloudBin=bin; S.cloudKey=key;
       LOCK.hash=await sha256(pin);
-      LOCK.qText=vault.qText||''; lockSave();
-      await encryptedSave();
+      LOCK.qText=vault.qText||'';
+      if(vault.qHash) LOCK.qHash=vault.qHash;  // enable PIN recovery on this device
+      LOCK.unlockTs=Date.now();                // mark unlocked so reopen stays in
+      LOCK.failCount=0;
+      lockSave();                              // persist LOCK immediately
+      await encryptedSave();                   // persist updated vault (with cloud creds)
       renderAll();
       hideLockscreen();
       toast('Data restored from cloud');
