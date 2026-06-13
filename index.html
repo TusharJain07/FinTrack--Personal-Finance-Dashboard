@@ -38,6 +38,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .nav-item.on{color:#fff;font-weight:600;border-bottom-color:#60a5fa;background:rgba(96,165,250,.12);text-shadow:0 0 20px rgba(96,165,250,.4)}
 .page{padding:20px 24px;max-width:1440px;margin:0 auto}
 .pane{display:none}.pane.on{display:block;animation:fi .2s ease}
+@keyframes ftNameReveal{
+  0%{opacity:0;transform:translateY(8px);letter-spacing:2px}
+  100%{opacity:1;transform:translateY(0);letter-spacing:-.8px}
+}
+.ft-name-animate{animation:ftNameReveal .7s cubic-bezier(.22,1,.36,1) both}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .fy-bar{background:linear-gradient(90deg,var(--navy),var(--navy2));color:#fff;padding:8px 18px;border-radius:var(--r-lg);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
 .fy-bar-label{font-size:13px;font-weight:600}
@@ -764,8 +769,27 @@ tr:hover td{background:#f8fafc}
       <b>Other devices:</b> Paste same API key + same Bin ID &rarr; click &darr; Load from Cloud.<br>
       <b>Tip:</b> Use the &#128203; Copy button to copy your Bin ID and share it to your other device (WhatsApp yourself).
     </p>
+    <!-- How to get a secure Access Key guide -->
+    <details style="margin:0 0 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:var(--r);padding:0">
+      <summary style="cursor:pointer;padding:10px 14px;font-size:12.5px;font-weight:600;color:#0369a1;list-style:none">
+        &#128273; How to get your API Key (use a secure Access Key) &#9662;
+      </summary>
+      <div style="padding:4px 16px 14px;font-size:12px;color:#0c4a6e;line-height:1.7">
+        <p style="margin:0 0 8px"><b>Important:</b> JSONbin gives you a <b>Master Key</b> (full account access) and lets you create scoped <b>Access Keys</b> (limited access). For a browser app like FinTrack, always use an <b>Access Key</b> &mdash; it&#39;s safer because it can only touch your bins, not your whole account.</p>
+        <p style="margin:8px 0 4px"><b>Steps (done on the jsonbin.io website, not here):</b></p>
+        <ol style="margin:4px 0 8px;padding-left:20px">
+          <li>Go to <a href="https://jsonbin.io" target="_blank" rel="noopener" style="color:#0284c7;font-weight:600">jsonbin.io</a> and log in (or sign up &mdash; it&#39;s free).</li>
+          <li>Open the <b>API Keys</b> page from your account dashboard.</li>
+          <li>Find the <b>Access Keys</b> section (below your Master Key).</li>
+          <li>Click <b>Create Access Key</b>, name it &ldquo;FinTrack&rdquo;.</li>
+          <li>Grant these permissions: <b>Bins Create</b>, <b>Bins Read</b>, <b>Bins Update</b>. Leave <b>Delete</b> off.</li>
+          <li>Copy the generated Access Key and paste it in the field below.</li>
+        </ol>
+        <p style="margin:8px 0 0;font-size:11.5px;opacity:.85">&#9888;&#65039; You can&#39;t edit a key&#39;s permissions after creating it &mdash; if you need to change them, delete the key and create a new one. Avoid pasting your Master Key here.</p>
+      </div>
+    </details>
     <div class="setting-row">
-      <label>JSONbin API Key</label>
+      <label>JSONbin API Key <span style="font-size:11px;color:var(--text3)">(paste your Access Key)</span></label>
       <input type="password" id="jsonbin-key" placeholder="$2b$10$..." style="width:260px;font-family:monospace;font-size:12px"
         onchange="S.cloudKey=this.value"/>
     </div>
@@ -821,6 +845,8 @@ tr:hover td{background:#f8fafc}
     <div class="setting-title">&#128190; Data Management</div>
     <div class="setting-row"><label>Save all data to browser</label><button class="btn btn-green" onclick="save()">&#128190; Save Now</button></div>
     <div class="setting-row"><label>Export transactions to CSV</label><button class="btn btn-blue" onclick="exportCSV()">&#11015; Export CSV</button></div>
+    <div class="setting-row"><label>Export full backup (JSON) <span style="font-size:11px;color:var(--text3)">— complete data, can be restored</span></label><button class="btn btn-green" onclick="exportJSON()">&#11015; Export Backup</button></div>
+    <div class="setting-row"><label>Restore from backup (JSON) <span style="font-size:11px;color:var(--text3)">— replaces all current data</span></label><button class="btn" style="background:var(--navy);color:#fff" onclick="document.getElementById('import-json-file').click()">&#11014; Restore Backup</button><input type="file" id="import-json-file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></div>
     <div class="setting-row"><label>Change passcode</label><button class="btn" style="background:var(--amber);color:#fff" onclick="lockAndReset()">&#128274; Change Passcode</button></div>
     <div class="setting-row"><label>Clear financial data <span style="font-size:11px;color:var(--text3)">(keeps your customisations)</span></label><button class="btn" style="background:var(--red);color:#fff" onclick="clearData()">&#128465; Clear Financial Data</button></div>
     <div class="setting-row"><label>Reset everything <span style="font-size:11px;color:var(--text3)">(wipes all data + customisations)</span></label><button class="btn" style="background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b" onclick="clearEverything()">&#9888; Factory Reset</button></div>
@@ -904,7 +930,7 @@ tr:hover td{background:#f8fafc}
     <div class="guide-row"><div class="guide-key">Transaction From</div><div class="guide-val">Banks and credit cards. Adding here makes them appear in Bank and CC tabs automatically.</div></div>
     <div class="guide-row"><div class="guide-key">Cloud Sync</div><div class="guide-val">JSONbin.io API Key + Bin ID. &#8595; Cloud in the top bar loads your latest backup on any device.</div></div>
     <div class="guide-row"><div class="guide-key">Financial Year</div><div class="guide-val">Set default FY (Indian FY = April&ndash;March). Each tab also has its own FY selector for historical views.</div></div>
-    <div class="guide-row"><div class="guide-key">Data Management</div><div class="guide-val">Export as JSON for backup. Import to restore. Clear Data removes transactions only &mdash; categories and settings are preserved.</div></div>
+    <div class="guide-row"><div class="guide-key">Data Management</div><div class="guide-val">Export a full JSON backup anytime and restore it later with one click. Export CSV for viewing in Excel. Clear Data removes transactions only &mdash; categories and settings are preserved.</div></div>
   </div>
 
   <div class="guide-card">
@@ -955,7 +981,7 @@ tr:hover td{background:#f8fafc}
       </svg>
       <div style="width:28px;height:1.5px;background:rgba(255,255,255,.12);margin:0 auto 12px;border-radius:2px"></div>
       <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px">Welcome back</div>
-      <div style="font-size:30px;font-weight:700;color:#fff;letter-spacing:-.8px;margin-bottom:14px" id="lock-username" id="lock-username"></div>
+      <div style="font-size:30px;font-weight:700;color:#fff;letter-spacing:-.8px;margin-bottom:14px" id="lock-username"></div>
       <!-- FinTrack badge with green fill animation on unlock -->
       <div class="ft-badge-wrap" id="ft-badge">
         <div class="ft-badge-content">
@@ -972,6 +998,7 @@ tr:hover td{background:#f8fafc}
       <div class="pin-keypad" id="unlock-keypad"></div>
       <div class="lock-error" id="unlock-error"></div>
       <div class="lock-hint" onclick="showForgot()">Forgot passcode?</div>
+      <div class="lock-hint" onclick="showRestoreCloud()" style="margin-top:6px">&#9729; New device? Restore from cloud</div>
     </div>
 
     <!-- STEP: setup passcode (first run) -->
@@ -996,6 +1023,7 @@ tr:hover td{background:#f8fafc}
     <div class="lock-step" id="step-secq">
       <div class="lock-badge">Security question</div>
       <p style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:16px">Used to reset your passcode if forgotten</p>
+      <div id="secq-migrate-note" style="display:none;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#a7f3d0;line-height:1.6">&#128274; Your data will now be <b>encrypted</b> with your passcode. This recovery question is the only way to get back in if you forget it. Tip: export a backup from Settings first.</div>
       <select class="lock-sel" id="secq-select">
         <option value="">— Choose a question —</option>
         <option>What was your first pet's name?</option>
@@ -1015,8 +1043,21 @@ tr:hover td{background:#f8fafc}
       <div class="lock-badge">Reset passcode</div>
       <p style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:16px" id="forgot-question"></p>
       <input class="lock-inp" type="password" id="forgot-answer" placeholder="Your answer"/>
-      <button class="lock-btn lock-btn-primary" onclick="checkSecQ()">Verify Answer</button>
+      <button class="lock-btn lock-btn-primary" id="forgot-verify-btn" onclick="checkSecQ()">Verify Answer</button>
+      <div id="forgot-norecovery" style="display:none;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);border-radius:10px;padding:12px;font-size:12px;color:#fca5a5;line-height:1.6">Without a security question, an encrypted passcode can't be recovered. If you have an exported backup file, reinstall FinTrack and restore it from Settings &#8594; Restore Backup.</div>
       <div class="lock-error" id="forgot-error"></div>
+      <div class="lock-hint" onclick="showStep('step-unlock')">&#8592; Back to unlock</div>
+    </div>
+
+    <!-- STEP: restore from cloud (new device) -->
+    <div class="lock-step" id="step-restore">
+      <div class="lock-badge">&#9729; Restore from Cloud</div>
+      <p style="color:rgba(255,255,255,.7);font-size:12.5px;margin-bottom:14px;line-height:1.6">Enter your cloud details and the passcode you used on your other device.</p>
+      <input class="lock-inp" type="text" id="restore-bin" placeholder="Bin ID" style="margin-bottom:8px"/>
+      <input class="lock-inp" type="password" id="restore-key" placeholder="Access Key" style="margin-bottom:8px"/>
+      <input class="lock-inp" type="password" id="restore-pin" placeholder="Your passcode" inputmode="numeric" style="margin-bottom:8px"/>
+      <button class="lock-btn lock-btn-primary" id="restore-btn" onclick="doRestoreCloud()">Restore my data</button>
+      <div class="lock-error" id="restore-error"></div>
       <div class="lock-hint" onclick="showStep('step-unlock')">&#8592; Back to unlock</div>
     </div>
 
@@ -1251,6 +1292,17 @@ function getFY(tid) { return (tabFY[tid]!==null) ? tabFY[tid] : S.fy; }
 function fyOpts() {
   return FY_YEARS.map(function(y){ return '<option value="'+y+'">FY '+y+'-'+(y+1)+'<\/option>'; }).join('');
 }
+// ── HTML ESCAPING (XSS protection) ─────────────────────
+function escapeHtml(str){
+  if(str===null||str===undefined) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
 function tagLabel(to) {
   ensureData();
   for (var si=0; si<S.sections.length; si++) {
@@ -1329,19 +1381,19 @@ function rebuildAllDropdowns() {
   fromSel.innerHTML='<option value="">— Select From —<\/option>'+
     S.fromOptions.map(function(grp){
       return '<optgroup label="'+grp.name+'">'+
-        grp.items.map(function(i){return '<option value="'+i.ck+'">'+i.lbl+'<\/option>';}).join('')+
+        grp.items.map(function(i){return '<option value="'+escapeHtml(i.ck)+'">'+escapeHtml(i.lbl)+'<\/option>';}).join('')+
         '<\/optgroup>';
     }).join('');
   // Transaction To: only Bank Accounts as transfer target (not credit cards), then all sections
   toSel.innerHTML='<option value="">— Select To —<\/option>'+
     S.fromOptions.filter(function(grp){return grp.id==='banks';}).map(function(grp){
       return '<optgroup label="'+grp.name+' (Transfer To)">'+
-        grp.items.map(function(i){return '<option value="'+i.ck+'">'+i.lbl+'<\/option>';}).join('')+
+        grp.items.map(function(i){return '<option value="'+escapeHtml(i.ck)+'">'+escapeHtml(i.lbl)+'<\/option>';}).join('')+
         '<\/optgroup>';
     }).join('')+
     S.sections.map(function(sec){
-      return '<optgroup label="'+sec.name+'">'+
-        sec.items.map(function(i){return '<option value="'+i.ck+'">'+i.lbl+'<\/option>';}).join('')+
+      return '<optgroup label="'+escapeHtml(sec.name)+'">'+
+        sec.items.map(function(i){return '<option value="'+escapeHtml(i.ck)+'">'+escapeHtml(i.lbl)+'<\/option>';}).join('')+
         '<\/optgroup>';
     }).join('');
 }
@@ -1671,10 +1723,10 @@ function renderTxn() {
       '<td style="white-space:nowrap;font-size:12px">'+d+'<\/td>'+
       '<td class="mono">'+(t.m||'')+'<\/td>'+
       '<td class="mono">'+(t.y||'')+'<\/td>'+
-      '<td style="font-size:12px">'+(t.from||'')+'<\/td>'+
-      '<td style="font-size:12px">'+(t.to||'')+'<\/td>'+
+      '<td style="font-size:12px">'+escapeHtml(t.from||'')+'<\/td>'+
+      '<td style="font-size:12px">'+escapeHtml(t.to||'')+'<\/td>'+
       '<td class="amt">'+fmtF(+t.amt)+'<\/td>'+
-      '<td style="color:var(--text3);font-size:12px">'+(t.notes||'')+'<\/td>'+
+      '<td style="color:var(--text3);font-size:12px">'+escapeHtml(t.notes||'')+'<\/td>'+
       '<td><span class="tag '+tc+'">'+tg+'<\/span><\/td>'+
       '<td><button class="del-btn" onclick="delTxn('+t.id+')">\u2715<\/button><\/td>'+
       '<\/tr>';
@@ -1746,7 +1798,7 @@ function renderMS() {
       var tot=vals.reduce(function(a,b){return a+b;},0);
       vals.forEach(function(v,i){sT[i]+=v;});
       html+='<tr>'+
-        '<td class="sticky-col" style="padding:7px 12px 7px 22px;font-size:12.5px;color:var(--text2)">'+item.lbl+'<\/td>'+
+        '<td class="sticky-col" style="padding:7px 12px 7px 22px;font-size:12.5px;color:var(--text2)">'+escapeHtml(item.lbl)+'<\/td>'+
         vals.map(function(v){return '<td class="ms-val" style="color:'+(v?'var(--text)':'var(--text3)')+'">'+  (v?fmtF(v):'&#8212;<\/td>');}).join('')+
         '<td class="ms-val" style="color:'+(tot?'var(--text)':'var(--text3)')+';background:#f8fafc">'+  (tot?fmtF(tot):'&#8212;')+'<\/td><\/tr>';
     });
@@ -1958,7 +2010,7 @@ function renderBank() {
     }).join('');
     return '<div class="bank-card" style="min-width:360px">'+
       '<div class="bank-hdr" style="background:linear-gradient(135deg,'+bk.color+','+bk.color+'cc)">'+
-        '<div class="bank-name">'+bk.name+'<\/div>'+
+        '<div class="bank-name">'+escapeHtml(bk.name)+'<\/div>'+
         '<div class="bank-type">'+bk.type+'<\/div>'+
         '<div class="bank-bal">'+fmtF(bal)+'<\/div><\/div>'+
       '<div class="ob-row" style="flex-wrap:wrap;gap:10px">'+
@@ -2095,7 +2147,7 @@ function renderCC(){
       var col=ccSolidColor(cidx);
       return '<div style="background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden">'+
         '<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+col+'"></div>'+
-        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:8px;margin-top:4px">'+cd.name+'</div>'+
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:8px;margin-top:4px">'+escapeHtml(cd.name)+'</div>'+
         '<div style="font-size:18px;font-weight:700;color:var(--navy);font-family:var(--mono)">'+fmtF(totalDue)+'</div>'+
         '<div style="font-size:10px;color:var(--text3);margin-top:2px">Total billed this FY</div>'+
         '<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">'+
@@ -2202,7 +2254,7 @@ function renderCC(){
     var ci=defs.indexOf(cd); var hdrBg=COLOR_PALETTE_SOLID[ci%COLOR_PALETTE_SOLID.length];
       return '<div class="cc-card">'+
       '<div class="cc-hdr '+cd.cls+'" style="background:linear-gradient(135deg,'+hdrBg+','+hdrBg+'dd)">'+
-        '<div class="bank-name">'+cd.name+'<\/div>'+
+        '<div class="bank-name">'+escapeHtml(cd.name)+'<\/div>'+
         '<div style="font-size:11px;opacity:.75;margin-top:2px">Due: '+fmtF(ts)+' | Paid: '+fmtF(tp)+'<\/div>'+
         '<div style="font-family:var(--mono);font-size:20px;font-weight:700;margin-top:6px">'+  fmtF(ts-tp)+'<span style="font-size:10px;opacity:.7;margin-left:4px">outstanding<\/span><\/div>'+
       '<\/div><div class="cc-body">'+body+'<\/div><\/div>';
@@ -2302,7 +2354,7 @@ function renderInvest(){
     var portfolio=ob+ann;
     gOB+=ob; vals.forEach(function(v,i){gT[i]+=v;}); gAnn+=ann;
     html+='<tr style="background:'+bg+'">'+
-      '<td class="sticky-col" style="padding:5px 8px;font-size:11.5px;font-weight:500;color:var(--text2);background:'+bg+'">'+inv.lbl+'<\/td>'+
+      '<td class="sticky-col" style="padding:5px 8px;font-size:11.5px;font-weight:500;color:var(--text2);background:'+bg+'">'+escapeHtml(inv.lbl)+'<\/td>'+
       '<td style="padding:4px 8px;text-align:right;background:#f0f9ff">'+
         '<input type="number" class="enum" value="'+(ob||'')+'" placeholder="0" title="Opening balance before tracking started" '+
         'style="width:90px" '+
@@ -2389,7 +2441,7 @@ function renderBudget(){
   S.sections.forEach(function(sec){
     sec.items.forEach(function(item,ii){
       if(sec.name!==lastSec){
-        html+='<tr><td colspan="6" style="padding:7px 12px;background:'+(sec.col||'var(--navy)')+';color:#fff;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">&#128193; '+sec.name+'<\/td><\/tr>';
+        html+='<tr><td colspan="6" style="padding:7px 12px;background:'+(sec.col||'var(--navy)')+';color:#fff;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">&#128193; '+escapeHtml(sec.name)+'<\/td><\/tr>';
         lastSec=sec.name;
       }
       var bg=ii%2?'#fff':'#f8fafc';
@@ -2404,7 +2456,7 @@ function renderBudget(){
       var sc=bgt===0?'var(--text3)':actual<=bgt?'var(--green)':'var(--red)';
       var remColor=remaining>=0?'var(--green)':'var(--red)';
       html+='<tr style="background:'+bg+'">'+
-        '<td style="padding:9px 12px;font-weight:500;color:var(--text2)">'+item.lbl+'<\/td>'+
+        '<td style="padding:9px 12px;font-weight:500;color:var(--text2)">'+escapeHtml(item.lbl)+'<\/td>'+
         '<td style="padding:9px 12px;text-align:right">'+
           '<input type="number" class="enum" value="'+(bRow.b||'')+'" placeholder="Enter annual budget" '+
           'onchange="S.budget['+(bidx>=0?bidx:0)+'].b=+this.value;save();renderBudget()"\/><\/td>'+
@@ -2449,7 +2501,7 @@ function renderCatMgr(){
         '<span style="display:flex;align-items:center;gap:6px">'+
           '<span style="opacity:.5;cursor:grab;font-size:16px" title="Drag to reorder">&#8597;</span>'+
           '&#128193; '+
-          '<input type="text" value="'+sec.name+'" '+
+          '<input type="text" value="'+escapeHtml(sec.name)+'" '+
           'style="background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.5);color:#fff;font-weight:600;font-size:12px;outline:none;width:140px" '+
           'onchange="S.sections['+si+'].name=this.value;save();renderAll()"/></span>'+
         '<span style="display:flex;align-items:center;gap:8px">'+
@@ -2464,7 +2516,7 @@ function renderCatMgr(){
     if(!sec.items.length) html+='<p style="font-size:12px;color:var(--text3);padding:4px 0">No items yet.<\/p>';
     sec.items.forEach(function(item,ii){
       html+='<div class="cat-item">'+
-        '<input class="cat-item-inp" type="text" value="'+item.lbl+'" '+
+        '<input class="cat-item-inp" type="text" value="'+escapeHtml(item.lbl)+'" '+
         'onchange="S.sections['+si+'].items['+ii+'].lbl=this.value;S.sections['+si+'].items['+ii+'].ck=this.value;save();rebuildAllDropdowns()"\/> '+
         '<button class="cat-del" onclick="delCatItem('+si+','+ii+')">&#10005;<\/button>'+
         '<\/div>';
@@ -2563,7 +2615,7 @@ function renderFromMgr(){
       '<div class="cat-items">';
     grp.items.forEach(function(item,ii){
       html+='<div class="cat-item">'+
-        '<input class="cat-item-inp" type="text" value="'+item.lbl+'" '+
+        '<input class="cat-item-inp" type="text" value="'+escapeHtml(item.lbl)+'" '+
         'onchange="S.fromOptions['+gi+'].items['+ii+'].lbl=this.value;S.fromOptions['+gi+'].items['+ii+'].ck=this.value;save();rebuildAllDropdowns()"\/> '+
         '<button class="cat-del" onclick="delFromItem('+gi+','+ii+')">&#10005;<\/button>'+
         '<\/div>';
@@ -2644,10 +2696,24 @@ function save(){
   // Capture API key from input if changed
   var ki=document.getElementById('jsonbin-key');
   if(ki && ki.value.trim()) S.cloudKey=ki.value.trim();
-  localStorage.setItem('ft_v8',JSON.stringify(S));
-  toast('Saved');
+  if(ENC.enabled && ENC.dek){
+    // Encrypted mode — persist to ft_enc vault, never write plaintext ft_v8
+    encryptedSave().then(function(){ toast('Saved'); })
+      .catch(function(e){ toast('Save failed: '+e.message); });
+  } else {
+    localStorage.setItem('ft_v8',JSON.stringify(S));
+    toast('Saved');
+  }
 }
 function load(){
+  // If an encrypted vault exists, data is NOT loaded here — it's loaded
+  // after the user unlocks with their PIN (unlockWithPIN populates S).
+  if(isEncrypted()){
+    ENC.enabled=true;
+    ensureData();
+    ensureTabConfig();
+    return;
+  }
   try{
     var keys=['ft_v8','ft_v7','ft_v6','ft_v4'];
     for(var ki=0;ki<keys.length;ki++){
@@ -2667,6 +2733,77 @@ function exportCSV(){
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
   a.download='FinTrack_'+S.fy+'-'+(S.fy+1)+'.csv';
   a.click(); toast('CSV exported');
+}
+
+// ── JSON FULL BACKUP EXPORT ────────────────────────────
+function exportJSON(){
+  try{
+    var data=JSON.stringify(S,null,2);
+    var blob=new Blob([data],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    var d=new Date();
+    var stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    a.download='FinTrack_Backup_'+stamp+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Backup exported');
+  }catch(e){
+    toast('Export failed: '+e.message);
+  }
+}
+
+// ── JSON FULL BACKUP IMPORT / RESTORE ──────────────────
+function importJSON(event){
+  var file=event.target.files[0];
+  if(!file){ return; }
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var imported;
+    try{
+      imported=JSON.parse(e.target.result);
+    }catch(err){
+      toast('Invalid backup file — not valid JSON');
+      event.target.value='';
+      return;
+    }
+    // Validate it looks like a FinTrack backup
+    if(!imported || typeof imported!=='object' || !('txns' in imported)){
+      toast('This does not look like a FinTrack backup file');
+      event.target.value='';
+      return;
+    }
+    var txnCount=Array.isArray(imported.txns)?imported.txns.length:0;
+    askConfirm(
+      'Restore Backup',
+      'Restore this backup? It contains '+txnCount+' transaction'+(txnCount===1?'':'s')+'.\n\n'+
+      'This will REPLACE all your current data. Consider exporting your current data first.',
+      function(){
+        try{
+          S=imported;
+          ensureData();
+          ensureTabConfig();
+          save();
+          rebuildAllDropdowns();
+          updateUserName();
+          renderAll();
+          toast('Backup restored — '+txnCount+' transactions loaded');
+        }catch(err2){
+          toast('Restore failed: '+err2.message);
+        }
+      },
+      'Yes, Restore'
+    );
+    event.target.value='';
+  };
+  reader.onerror=function(){
+    toast('Could not read the file');
+    event.target.value='';
+  };
+  reader.readAsText(file);
 }
 
 // ═══ RENDER ALL ════════════════════════════════════════
@@ -2829,6 +2966,167 @@ async function sha256(message){
   return hashArr.map(function(b){return b.toString(16).padStart(2,'0');}).join('');
 }
 
+// ══════════════════════════════════════════════════════════════
+// ENCRYPTION ENGINE (Fix 1, Stage 1) — PBKDF2 -> AES-GCM
+// Data Encryption Key (DEK) model:
+//   - A random AES-256 DEK encrypts the actual data
+//   - DEK is itself encrypted ("wrapped") by a key derived from the PIN
+//   - (Stage 2 adds a 2nd wrap via security answer for recovery)
+// ══════════════════════════════════════════════════════════════
+
+var ENC = {
+  // in-memory only — never persisted. Holds the unwrapped DEK after unlock.
+  dek: null,
+  enabled: false   // mirrors whether ft_enc exists
+};
+
+function _b64encode(buf){
+  var bytes=new Uint8Array(buf), bin='';
+  for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function _b64decode(b64){
+  var bin=atob(b64), bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return bytes.buffer;
+}
+function _randBytes(n){
+  var a=new Uint8Array(n); crypto.getRandomValues(a); return a;
+}
+
+// Derive an AES-GCM wrapping key from a secret (PIN or answer) + salt
+async function deriveKey(secret, saltBuf){
+  var baseKey=await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(secret), {name:'PBKDF2'}, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt:saltBuf, iterations:150000, hash:'SHA-256'},
+    baseKey,
+    {name:'AES-GCM', length:256},
+    false,
+    ['encrypt','decrypt']
+  );
+}
+
+// Generate a fresh random DEK (AES-256-GCM key, extractable so it can be wrapped)
+async function generateDEK(){
+  return crypto.subtle.generateKey({name:'AES-GCM', length:256}, true, ['encrypt','decrypt']);
+}
+
+// Wrap (encrypt) the DEK with a derived key -> returns {iv, data} base64
+async function wrapDEK(dek, wrapKey){
+  var rawDek=await crypto.subtle.exportKey('raw', dek);
+  var iv=_randBytes(12);
+  var enc=await crypto.subtle.encrypt({name:'AES-GCM', iv:iv}, wrapKey, rawDek);
+  return {iv:_b64encode(iv), data:_b64encode(enc)};
+}
+
+// Unwrap (decrypt) the DEK using a derived key. Throws if wrong key.
+async function unwrapDEK(wrapped, wrapKey){
+  var iv=new Uint8Array(_b64decode(wrapped.iv));
+  var rawDek=await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, wrapKey, _b64decode(wrapped.data));
+  return crypto.subtle.importKey('raw', rawDek, {name:'AES-GCM', length:256}, true, ['encrypt','decrypt']);
+}
+
+// Encrypt a plaintext string with the DEK -> {iv, data} base64
+async function encryptWithDEK(plaintext, dek){
+  var iv=_randBytes(12);
+  var enc=await crypto.subtle.encrypt(
+    {name:'AES-GCM', iv:iv}, dek, new TextEncoder().encode(plaintext)
+  );
+  return {iv:_b64encode(iv), data:_b64encode(enc)};
+}
+
+// Decrypt {iv, data} with the DEK -> plaintext string. Throws if tampered/wrong.
+async function decryptWithDEK(blob, dek){
+  var iv=new Uint8Array(_b64decode(blob.iv));
+  var dec=await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, dek, _b64decode(blob.data));
+  return new TextDecoder().decode(dec);
+}
+
+// ── Encrypted vault persistence (localStorage key: ft_enc) ──
+// Structure: { v:1, salt, pinWrap:{iv,data}, ansWrap:{iv,data}|null, qText, payload:{iv,data} }
+function _encLoadVault(){
+  try{ var d=localStorage.getItem('ft_enc'); return d?JSON.parse(d):null; }catch(e){ return null; }
+}
+function _encSaveVault(vault){
+  localStorage.setItem('ft_enc', JSON.stringify(vault));
+}
+function isEncrypted(){
+  return !!_encLoadVault();
+}
+
+// Called during setup: enable encryption with a PIN (+ optional security Q/A)
+// Creates the vault, encrypts current S, removes plaintext ft_v8.
+async function enableEncryption(pin, qText, answer){
+  var salt=_randBytes(16);
+  var dek=await generateDEK();
+  var pinKey=await deriveKey(pin, salt);
+  var pinWrap=await wrapDEK(dek, pinKey);
+  var ansWrap=null;
+  if(qText && answer){
+    var ansKey=await deriveKey(_normAnswer(answer), salt);
+    ansWrap=await wrapDEK(dek, ansKey);
+  }
+  var payload=await encryptWithDEK(JSON.stringify(S), dek);
+  var vault={ v:1, salt:_b64encode(salt), pinWrap:pinWrap, ansWrap:ansWrap, qText:qText||'', payload:payload };
+  _encSaveVault(vault);
+  ENC.dek=dek; ENC.enabled=true;
+  // Remove the plaintext copy — data now lives encrypted only
+  localStorage.removeItem('ft_v8');
+}
+
+// Normalise a security answer (lowercase + trim) for consistent key derivation
+function _normAnswer(a){ return String(a||'').trim().toLowerCase(); }
+
+// Unlock using PIN: derive key, unwrap DEK, decrypt payload into S
+async function unlockWithPIN(pin){
+  var vault=_encLoadVault();
+  if(!vault) throw new Error('No encrypted vault');
+  var salt=new Uint8Array(_b64decode(vault.salt));
+  var pinKey=await deriveKey(pin, salt);
+  var dek=await unwrapDEK(vault.pinWrap, pinKey); // throws if wrong PIN
+  var plain=await decryptWithDEK(vault.payload, dek); // throws if tampered
+  S=JSON.parse(plain);
+  ENC.dek=dek; ENC.enabled=true;
+  ensureData(); ensureTabConfig();
+  return true;
+}
+
+// Unlock using security answer (recovery): same but via ansWrap
+async function unlockWithAnswer(answer){
+  var vault=_encLoadVault();
+  if(!vault || !vault.ansWrap) throw new Error('No recovery configured');
+  var salt=new Uint8Array(_b64decode(vault.salt));
+  var ansKey=await deriveKey(_normAnswer(answer), salt);
+  var dek=await unwrapDEK(vault.ansWrap, ansKey); // throws if wrong answer
+  var plain=await decryptWithDEK(vault.payload, dek);
+  S=JSON.parse(plain);
+  ENC.dek=dek; ENC.enabled=true;
+  ensureData(); ensureTabConfig();
+  return true;
+}
+
+// Re-encrypt and persist current S using the in-memory DEK (called by save())
+async function encryptedSave(){
+  if(!ENC.dek) return false;
+  var vault=_encLoadVault();
+  if(!vault) return false;
+  vault.payload=await encryptWithDEK(JSON.stringify(S), ENC.dek);
+  _encSaveVault(vault);
+  return true;
+}
+
+// Change PIN: re-wrap the existing DEK with a new PIN-derived key
+async function changeEncryptionPIN(newPin){
+  var vault=_encLoadVault();
+  if(!vault || !ENC.dek) throw new Error('Not unlocked');
+  var salt=new Uint8Array(_b64decode(vault.salt));
+  var pinKey=await deriveKey(newPin, salt);
+  vault.pinWrap=await wrapDEK(ENC.dek, pinKey);
+  _encSaveVault(vault);
+}
+
 // ═══════════════════════════════════════════════════════════
 //  LOCK SCREEN STATE
 // ═══════════════════════════════════════════════════════════
@@ -2964,8 +3262,30 @@ function initUnlock(){
       pinClear('unlock-dots'); return;
     }
     var hash=await sha256(pin);
-    if(hash===LOCK.hash){
+    var pinOK=(hash===LOCK.hash);
+    // Fix 1: if encrypted, the real test is whether the PIN decrypts the vault
+    if(pinOK && isEncrypted()){
+      try{
+        await unlockWithPIN(pin);
+      }catch(e){
+        pinOK=false; // hash matched but decryption failed — treat as wrong
+      }
+    }
+    if(pinOK){
       LOCK.failCount=0; LOCK.unlockTs=now; lockSave();
+      // Fix 1 migration: existing user with a PIN but no encryption vault yet.
+      // Encrypt their data now, using this verified PIN + a security question.
+      if(!isEncrypted()){
+        // Migration: existing user, verified PIN, no vault yet.
+        // Route to security-question step which will encrypt their data.
+        _setupPin=pin;
+        document.getElementById('lock-sub').textContent='Secure your data — set a recovery question';
+        var mb=document.getElementById('secq-migrate-note');
+        if(mb) mb.style.display='block';
+        showStep('step-secq');
+        return;
+      }
+      renderAll();
       hideLockscreen();
     } else {
       LOCK.failCount=(LOCK.failCount||0)+1; lockSave();
@@ -3047,25 +3367,124 @@ async function saveSecQ(){
   LOCK.qText=q;
   LOCK.qHash=await sha256(a);
   lockSave();
+  // Fix 1: enable real encryption — encrypt current S with PIN + recovery answer
+  try{
+    await enableEncryption(_setupPin, q, a);
+  }catch(e){
+    lockError('secq-error','Could not enable encryption: '+e.message);
+    return;
+  }
+  _setupPin='';
+  var mb=document.getElementById('secq-migrate-note');
+  if(mb) mb.style.display='none';
+  renderAll();
   hideLockscreen();
 }
 
 // ── FORGOT flow ────────────────────────────────────────────
+var _forgotAttempts=0;
+// ── RESTORE FROM CLOUD (new device, Fix 1 Stage 3) ──────
+function showRestoreCloud(){
+  ['restore-bin','restore-key','restore-pin'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  var err=document.getElementById('restore-error'); if(err) err.textContent='';
+  document.getElementById('lock-sub').textContent='Restore your data';
+  showStep('step-restore');
+}
+
+async function doRestoreCloud(){
+  var bin=(document.getElementById('restore-bin').value||'').trim();
+  var key=(document.getElementById('restore-key').value||'').trim();
+  var pin=(document.getElementById('restore-pin').value||'').trim();
+  if(!bin||!key){ lockError('restore-error','Enter both Bin ID and Access Key.'); return; }
+  if(pin.length<4){ lockError('restore-error','Enter your 4-digit passcode.'); return; }
+  lockError('restore-error','Connecting to cloud...');
+  try{
+    var resp=await fetch(JSONBIN_API+'/b/'+bin+'/latest',{headers:{'X-Master-Key':key}});
+    var data=await resp.json();
+    if(data.record && data.record.enc && data.record.fintrack_enc){
+      // Encrypted vault — store and unlock with the entered PIN
+      var vault=JSON.parse(data.record.fintrack_enc);
+      _encSaveVault(vault);
+      ENC.enabled=true; ENC.dek=null;
+      localStorage.removeItem('ft_v8');
+      try{
+        await unlockWithPIN(pin);
+      }catch(e){
+        lockError('restore-error','Passcode did not match this backup. Try again.');
+        return;
+      }
+      // Success — persist cloud creds locally and finish
+      S.cloudBin=bin; S.cloudKey=key;
+      LOCK.hash=await sha256(pin);
+      LOCK.qText=vault.qText||''; lockSave();
+      await encryptedSave();
+      renderAll();
+      hideLockscreen();
+      toast('Data restored from cloud');
+    } else if(data.record && data.record.fintrack){
+      // Unencrypted backup — load directly
+      var remote=JSON.parse(data.record.fintrack);
+      delete remote.cloudKey;
+      S=Object.assign(S,remote);
+      S.cloudBin=bin; S.cloudKey=key;
+      ensureData(); ensureTabConfig();
+      localStorage.setItem('ft_v8',JSON.stringify(S));
+      renderAll();
+      hideLockscreen();
+      toast('Data restored from cloud');
+    } else {
+      lockError('restore-error','No FinTrack data found in that bin.');
+    }
+  }catch(e){
+    lockError('restore-error','Could not connect: '+e.message);
+  }
+}
+
 function showForgot(){
   var el=document.getElementById('forgot-question');
-  if(el) el.textContent=LOCK.qText||'(No security question set)';
+  var hasQ=!!LOCK.qText;
+  if(el) el.textContent=hasQ?LOCK.qText:'No security question was set on this device.';
+  // Toggle answer input / verify button based on whether recovery is possible
+  var ans=document.getElementById('forgot-answer');
+  var btn=document.getElementById('forgot-verify-btn');
+  var noRec=document.getElementById('forgot-norecovery');
+  if(ans) ans.style.display=hasQ?'':'none';
+  if(btn) btn.style.display=hasQ?'':'none';
+  if(noRec) noRec.style.display=hasQ?'none':'block';
+  if(ans) ans.value='';
+  _forgotAttempts=0;
   showStep('step-forgot');
 }
 
 async function checkSecQ(){
   var a=(document.getElementById('forgot-answer').value||'').trim().toLowerCase();
+  if(a.length<2){ lockError('forgot-error','Please enter your answer.'); return; }
   var hash=await sha256(a);
-  if(hash===LOCK.qHash){
-    document.getElementById('lock-sub').textContent='Enter new passcode';
+  var answerOK=(hash===LOCK.qHash);
+  // Fix 1: if encrypted, actually decrypt the vault using the answer
+  if(answerOK && isEncrypted()){
+    try{
+      await unlockWithAnswer(a);
+    }catch(e){
+      answerOK=false;
+    }
+  }
+  if(answerOK){
+    _forgotAttempts=0;
+    document.getElementById('lock-sub').textContent='Create your new passcode';
     showStep('step-newpin');
     initNewPin();
   } else {
-    lockError('forgot-error','Answer does not match.');
+    _forgotAttempts++;
+    var msg='That answer doesn\'t match. ';
+    msg+='Answers are not case-sensitive but must otherwise match exactly.';
+    if(_forgotAttempts>=3){
+      msg='Still no match after '+_forgotAttempts+' tries. If you have an exported backup, '+
+          'you can reinstall FinTrack fresh and restore it from Settings.';
+    }
+    lockError('forgot-error',msg);
   }
 }
 
@@ -3086,6 +3505,13 @@ function initNewPin(){
       } else {
         LOCK.hash=await sha256(pin2);
         LOCK.failCount=0; LOCK.unlockTs=Date.now(); lockSave();
+        // Fix 1: re-wrap the DEK (recovered via answer) under the NEW pin
+        if(isEncrypted() && ENC.dek){
+          try{ await changeEncryptionPIN(pin2); }
+          catch(e){ lockError('confirm-error','Could not update encryption: '+e.message); return; }
+        }
+        _setupPin='';
+        renderAll();
         hideLockscreen();
         toast('Passcode updated');
       }
@@ -3198,7 +3624,13 @@ function shouldLock(){
 
 function bootLock(){
   var lu=document.getElementById('lock-username');
-  if(lu) lu.textContent=S.userName?'Welcome back, '+S.userName:'Welcome to FinTrack';
+  if(lu){
+    lu.textContent=S.userName?S.userName:'Welcome';
+    // Stage 3c: animate the name reveal
+    lu.classList.remove('ft-name-animate');
+    void lu.offsetWidth;
+    lu.classList.add('ft-name-animate');
+  }
 
   lockLoad();
   // Restore saved timeout preference
@@ -3271,13 +3703,28 @@ function cloudBin(){
   return (S.cloudBin||'').trim();
 }
 
+// ── Build cloud payload — encrypted vault if encryption is on ──
+function buildCloudPayload(){
+  if(ENC.enabled && isEncrypted()){
+    // Upload the encrypted vault (payload + salt + pinWrap + ansWrap + qText).
+    // All are safe in the cloud: the data is AES-encrypted and the DEK is
+    // wrapped by PIN/answer-derived keys — useless without the PIN or answer.
+    var vault=_encLoadVault();
+    return JSON.stringify({fintrack_enc: JSON.stringify(vault), enc:true});
+  }
+  // Unencrypted fallback (Fix 2: strip cloudKey)
+  var _cleanS=Object.assign({},S);
+  delete _cleanS.cloudKey;
+  return JSON.stringify({fintrack: JSON.stringify(_cleanS)});
+}
+
 async function cloudSave(){
   var key=cloudKey();
   if(!key){ cloudStatus('Enter your JSONbin API key in Settings first.','error'); return; }
   syncBadge('busy','Saving...');
   cloudStatus('Saving to cloud...','');
   try{
-    var payload=JSON.stringify({fintrack: JSON.stringify(S)});
+    var payload=buildCloudPayload();
     var resp, data;
     if(!cloudBin()){
       // Create new bin
@@ -3324,12 +3771,29 @@ async function cloudLoad(){
       headers:{'X-Master-Key':key}
     });
     var data=await resp.json();
-    if(data.record && data.record.fintrack){
+    if(data.record && data.record.enc && data.record.fintrack_enc){
+      // Encrypted vault from cloud — store it locally, then require PIN unlock
+      var vault=JSON.parse(data.record.fintrack_enc);
+      _encSaveVault(vault);
+      ENC.enabled=true; ENC.dek=null;
+      localStorage.removeItem('ft_v8'); // ensure no stale plaintext remains
+      syncBadge('ok','Loaded '+new Date().toLocaleTimeString());
+      cloudStatus('Encrypted data loaded. Enter your passcode to unlock.','ok');
+      // Re-show lock screen to unlock the freshly-downloaded vault
+      LOCK.hash=LOCK.hash||'_cloud_'; // ensure unlock step shows
+      showLockscreen();
+      document.getElementById('lock-sub').textContent='Enter your passcode to unlock cloud data';
+      showStep('step-unlock'); initUnlock();
+    } else if(data.record && data.record.fintrack){
       var remote=JSON.parse(data.record.fintrack);
+      // FIX 2: keep the locally-entered API key; never let remote overwrite/clear it
+      var _localKey=S.cloudKey;
+      delete remote.cloudKey;
       S=Object.assign(S,remote);
+      if(_localKey) S.cloudKey=_localKey;
       ensureData(); ensureTabConfig();
       applyTabConfig(); renderAll();
-      localStorage.setItem('ft_v8',JSON.stringify(S));
+      if(!(ENC.enabled)) localStorage.setItem('ft_v8',JSON.stringify(S));
       syncBadge('ok','Loaded '+new Date().toLocaleTimeString());
       cloudStatus('Loaded from cloud at '+new Date().toLocaleTimeString(),'ok');
     } else {
@@ -3662,7 +4126,7 @@ function renderLoan(){
       // ── Header ──
       '<div class="loan-card-hdr '+cls+'">'+
         '<div>'+
-          '<div class="loan-name">'+item.lbl+'</div>'+
+          '<div class="loan-name">'+escapeHtml(item.lbl)+'</div>'+
           '<div class="loan-bal-label">Outstanding Principal</div>'+
           '<div class="loan-bal">'+fmtF(outstanding)+'</div>'+
         '</div>'+
@@ -3923,7 +4387,7 @@ function renderCCBillPanel(){
   var defs=buildCCDefs();
   sel.innerHTML='<option value="">-- Select Card --</option>'+
     defs.map(function(cd){
-      return '<option value="'+cd.key+'">'+cd.name+'</option>';
+      return '<option value="'+escapeHtml(cd.key)+'">'+escapeHtml(cd.name)+'</option>';
     }).join('');
 }
 
