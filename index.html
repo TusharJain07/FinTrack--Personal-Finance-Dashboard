@@ -64,7 +64,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ep-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px}
 .ep-sub{font-size:11.5px;color:rgba(255,255,255,.5);margin-bottom:16px}
 .ep-grid{display:grid;grid-template-columns:130px 1fr 1fr 130px 1fr 40px;gap:10px;align-items:end}
-@media(max-width:900px){.ep-grid{grid-template-columns:1fr 1fr}}
+/* Large laptops / smaller desktops */
+@media(max-width:1280px){
+  .page{padding:16px 18px}
+  .ep-grid{grid-template-columns:1fr 1fr 1fr;gap:10px}
+}
+/* Small laptops / tablets */
+@media(max-width:900px){
+  .page{padding:14px 14px}
+  .ep-grid{grid-template-columns:1fr 1fr}
+}
+/* Phones */
+@media(max-width:600px){
+  .page{padding:12px 10px}
+  .ep-grid{grid-template-columns:1fr;gap:8px}
+  .entry-panel{padding:16px 14px}
+}
 .fg label{display:block;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.6);margin-bottom:5px}
 .fc{width:100%;padding:8px 11px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--r);color:#fff;font-family:var(--font);font-size:12.5px;outline:none;-webkit-appearance:none}
 .fc:focus{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5)}
@@ -485,9 +500,9 @@ tr:hover td{background:#f8fafc}
       <div class="fg"><label>&#128194; Transaction To</label><select class="fc" id="inp-to" onchange="onToChange()"><option value="">Loading...</option></select></div>
       <div class="fg"><label>&#8377; Amount</label><input type="number" class="fc" id="inp-amt" placeholder="0" min="0"/></div>
       <div class="fg"><label>&#128221; Notes</label><input type="text" class="fc" id="inp-notes" placeholder="Optional..."/></div>
-      <div class="fg" id="prepay-toggle" style="display:none">
+      <div class="fg" id="prepay-toggle" style="display:none;grid-column:1/-1;align-self:start">
         <label style="margin-bottom:0">&#127968; Loan Month</label>
-        <select class="fc" id="inp-loan-month" style="margin-top:6px;font-size:12px" title="Which month EMI is this for?">
+        <select class="fc" id="inp-loan-month" style="margin-top:6px;font-size:12px;max-width:220px" title="Which month EMI is this for?">
           <option value="">— Same as txn month —</option>
           <option>Apr</option><option>May</option><option>Jun</option><option>Jul</option>
           <option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option>
@@ -498,9 +513,9 @@ tr:hover td{background:#f8fafc}
           <span style="font-size:12px;color:rgba(255,255,255,.85)">Principal-only prepayment</span>
         </label>
       </div>
-      <div class="fg" id="cc-bill-toggle" style="display:none">
+      <div class="fg" id="cc-bill-toggle" style="display:none;grid-column:1/-1;align-self:start">
         <label style="margin-bottom:0">&#128179; CC Bill Month</label>
-        <select class="fc" id="inp-cc-month" style="margin-top:6px;font-size:12px">
+        <select class="fc" id="inp-cc-month" style="margin-top:6px;font-size:12px;max-width:220px">
           <option value="">-- Same as txn month --</option>
           <option>Apr</option><option>May</option><option>Jun</option><option>Jul</option>
           <option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option>
@@ -677,9 +692,7 @@ tr:hover td{background:#f8fafc}
     <div style="padding:18px 20px 14px;background:rgba(255,255,255,.02)"><canvas id="cc-chart" height="100"></canvas></div>
   </div>
 
-  <div style="overflow-x:auto;padding-bottom:6px">
-  <div id="cc-grid" style="display:flex;flex-direction:row;gap:16px;min-width:max-content"></div>
-</div>
+  <div style="overflow-x:auto;padding-bottom:6px"><div style="display:flex;justify-content:center;min-width:max-content;margin:0 auto"><div id="cc-grid" style="display:flex;flex-direction:row;gap:16px"></div></div></div>
 </div>
 
 <!-- INVESTMENTS -->
@@ -873,7 +886,7 @@ tr:hover td{background:#f8fafc}
   <div class="guide-card">
     <div class="guide-title">&#9654; Quick Start &mdash; 5 Steps</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
-      <div style="display:flex;gap:12px;align-items:flex-start"><div style="background:var(--navy);color:#fff;border-radius:50%;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">1</div><div><b>Set up Profile</b> &mdash; Settings &#8594; Profile. Enter your name and 4-digit passcode.</div></div>
+      <div style="display:flex;gap:12px;align-items:flex-start"><div style="background:var(--navy);color:#fff;border-radius:50%;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">1</div><div><b>Set up Profile &amp; passcode</b> &mdash; Settings &#8594; Profile. Enter your name and a 4-digit passcode. The passcode <b>encrypts</b> your data, so also set a security question for recovery.</div></div>
       <div style="display:flex;gap:12px;align-items:flex-start"><div style="background:var(--navy);color:#fff;border-radius:50%;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">2</div><div><b>Customise Categories</b> &mdash; Settings &#8594; Transaction To. Rename SIP 1&ndash;4 to your fund names, add expense categories.</div></div>
       <div style="display:flex;gap:12px;align-items:flex-start"><div style="background:var(--navy);color:#fff;border-radius:50%;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">3</div><div><b>Add Banks &amp; Cards</b> &mdash; Settings &#8594; Transaction From. They appear in Bank and CC tabs automatically with auto-assigned colours.</div></div>
       <div style="display:flex;gap:12px;align-items:flex-start"><div style="background:var(--navy);color:#fff;border-radius:50%;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">4</div><div><b>Log Transactions</b> &mdash; Transactions tab &#8594; + Add Transaction. Fill Date, Amount, From, To, Notes. All tabs refresh instantly.</div></div>
@@ -945,7 +958,24 @@ tr:hover td{background:#f8fafc}
     <div class="guide-row"><div class="guide-key">Local Save</div><div class="guide-val">Click &#128190; Save (top bar). Stored in browser localStorage. Works fully offline.</div></div>
     <div class="guide-row"><div class="guide-key">Cloud Sync</div><div class="guide-val">JSONbin.io in Settings. &#8595; Cloud loads your latest data on any device.</div></div>
     <div class="guide-row"><div class="guide-key">Privacy</div><div class="guide-val">Your data never leaves your device unless you set up Cloud Sync. No analytics, no tracking, no third-party services.</div></div>
-    <div class="guide-row"><div class="guide-key">Cross-device</div><div class="guide-val">Download this HTML file, open in any browser. Pair with Cloud Sync to sync. No installation or subscription required.</div></div>
+    <div class="guide-row"><div class="guide-key">Cross-device</div><div class="guide-val">Open the app on any device. On a new device, use <b>Restore from Cloud</b> on the lock screen (enter Bin ID, Access Key and your passcode) to pull your data down.</div></div>
+  </div>
+
+  <div class="guide-card">
+    <div class="guide-title">&#128274; Security &amp; Privacy</div>
+    <div class="guide-row"><div class="guide-key">Passcode encryption</div><div class="guide-val">When you set a 4-digit passcode, your data is <b>encrypted</b> (PBKDF2 &rarr; AES-GCM). Without the passcode, the stored data is unreadable &mdash; even in your browser's storage. The passcode isn't just a screen lock; it's the key to your data.</div></div>
+    <div class="guide-row"><div class="guide-key">Security question</div><div class="guide-val">During setup you set a recovery question. If you ever forget your passcode, answer it to recover your data and set a new passcode. <b>Important:</b> if you forget both the passcode and the answer, the data cannot be recovered &mdash; that's how real encryption works.</div></div>
+    <div class="guide-row"><div class="guide-key">Forgot passcode</div><div class="guide-val">On the lock screen tap &ldquo;Forgot passcode?&rdquo; &rarr; answer your security question &rarr; set a new passcode. Answers are not case-sensitive but must otherwise match what you set.</div></div>
+    <div class="guide-row"><div class="guide-key">Encrypted cloud</div><div class="guide-val">When encryption is on, your cloud backup is also encrypted. Your passcode never leaves your device, and the cloud copy is useless to anyone without it.</div></div>
+    <div class="guide-row"><div class="guide-key">Access Key (not Master Key)</div><div class="guide-val">For cloud sync, create a scoped <b>Access Key</b> on jsonbin.io (Bins Create/Read/Update) rather than your Master Key. Set <b>Key type = Access Key</b> in Settings. See the in-app guide in Settings &rarr; Cloud Sync.</div></div>
+  </div>
+
+  <div class="guide-card">
+    <div class="guide-title">&#128190; Backup &amp; Restore</div>
+    <div class="guide-row"><div class="guide-key">Export Backup</div><div class="guide-val">Settings &rarr; <b>Export Backup</b> saves a complete <b>.json</b> file of all your data. Do this periodically &mdash; it's your offline safety net (store it in Google Drive, email, etc.).</div></div>
+    <div class="guide-row"><div class="guide-key">Restore Backup</div><div class="guide-val">Settings &rarr; <b>Restore Backup</b> &rarr; pick your .json file. It replaces current data after a confirmation. Useful when moving between domains/devices or recovering.</div></div>
+    <div class="guide-row"><div class="guide-key">Export CSV</div><div class="guide-val">Settings &rarr; Export CSV gives a spreadsheet of transactions for viewing in Excel (CSV can't be re-imported &mdash; use JSON backup to restore).</div></div>
+    <div class="guide-row"><div class="guide-key">Three things to remember</div><div class="guide-val">Your <b>passcode</b>, your <b>security answer</b>, and your <b>Bin ID + Access Key</b>. With these (or a JSON backup), your data is always recoverable.</div></div>
   </div>
 
   <div class="guide-card" style="background:#fffbeb;border-color:#fde68a">
@@ -2044,6 +2074,8 @@ function ccStatus(stmt,paid,due,pay,explicit){
     if(!explicit && p&&d&&p>d) return{t:'\u274c Paid Late',c:'st-over'};
     return{t:'\u2705 Paid',c:'st-paid'};
   }
+  // Due amount explicitly 0 with a due date set → valid 'Nothing to Pay'
+  if((!stmt||stmt===0) && d) return{t:'\u2705 Nothing to Pay',c:'st-paid'};
   if(!stmt) return{t:'&#8212;',c:'st-none'};
   var out=stmt-paid;
   if(out<=0 && !explicit && p&&d&&p>d) return{t:'\u274c Fully Paid (Late)',c:'st-over'};
@@ -2224,7 +2256,7 @@ function renderCC(){
 
   var cgEl=document.getElementById('cc-grid');
   if(cgEl){
-    cgEl.style.cssText='display:flex;flex-direction:row;gap:16px;min-width:max-content';
+    cgEl.style.cssText='display:flex;flex-direction:row;gap:16px';
     cgEl.innerHTML=defs.map(function(cd){
     // Ensure ccData exists for this key
     if(!S.ccData[cd.key]){
@@ -2238,14 +2270,14 @@ function renderCC(){
       return '<div class="cc-month-block"><div class="cc-month-name">'+m+'<\/div>'+
         '<div class="cc-fields">'+
           '<div><div class="cc-field-lbl">Due Amount<\/div>'+
-            '<div class="mono" style="font-size:13px;font-weight:700;color:var(--navy);min-height:22px">'+(r.stmt?fmtF(r.stmt):'<span style="color:var(--text3);font-size:11px">&#8212;</span>')+'<\/div><\/div>'+
+            '<div class="mono" style="font-size:13px;font-weight:700;color:var(--navy);min-height:22px">'+((r.stmt||r.dueDate)?fmtF(r.stmt||0):'<span style="color:var(--text3);font-size:11px">&#8212;</span>')+'<\/div><\/div>'+
           '<div><div class="cc-field-lbl">Paid<\/div>'+
             '<div class="mono" style="font-size:12px;color:'+(paid?'var(--green)':'var(--text3)')+'">'+  (paid?fmtF(paid):'&#8212;')+'<\/div><\/div>'+
           '<div><div class="cc-field-lbl">Outstanding<\/div>'+
             (function(){
               var eff=Math.max(0,(r.stmt||0)-paid);
               var col=eff>0?'var(--red)':'var(--green)';
-              var val=r.stmt?fmtF(eff):(paid>0?'<span style="font-size:10px">Enter due amount</span>':'&#8212;');
+              var val=(r.stmt||r.dueDate)?fmtF(eff):(paid>0?'<span style="font-size:10px">Enter due amount</span>':'&#8212;');
               return '<div class="mono" style="font-size:12px;color:'+col+'">'+val+'<\/div>';
             })()+
           '<\/div>'+
@@ -4423,12 +4455,14 @@ function renderCCBillPanel(){
 
 function addCCBill(){
   var cardKey=document.getElementById('bill-card').value;
-  var amt=parseFloat(document.getElementById('bill-amt').value);
+  var amtRaw=document.getElementById('bill-amt').value;
+  var amt=parseFloat(amtRaw);
   var due=document.getElementById('bill-due').value;
   var status=document.getElementById('bill-status');
 
   if(!cardKey){ showBillStatus('Select a credit card','error'); return; }
-  if(!amt||amt<=0){ showBillStatus('Enter a valid amount','error'); return; }
+  // Allow 0 as a valid bill (nothing to pay this cycle). Reject only empty/negative/non-numeric.
+  if(amtRaw===''||amtRaw===null||isNaN(amt)||amt<0){ showBillStatus('Enter a valid amount (0 or more)','error'); return; }
   if(!due){ showBillStatus('Enter the due date','error'); return; }
 
   // Auto-detect month from due date
